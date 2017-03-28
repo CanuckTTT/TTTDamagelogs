@@ -74,13 +74,13 @@ net.Receive("DL_StartChat", function(_len, ply)
 	end
 	
 	if not IsValid(victim) or not IsValid(attacker) then
-		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "The victim or the reported player are disconnected!", 5, "buttons/weapon_cant_buy.wav")
+		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "The victim or the reported player are disconnected!", 5, "")
 		return 		
 	end
 	
 	for k,v in pairs(Damagelog.Reports.Current) do
 		if v.chat_open and k == report_index then
-			ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "There is already a chat for this report!", 5, "buttons/weapon_cant_buy.wav")
+			ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "There is already a chat for this report!", 5, "")
 			return
 		end
 	end
