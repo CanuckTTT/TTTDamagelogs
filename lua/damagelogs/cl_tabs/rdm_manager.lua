@@ -209,7 +209,7 @@ local function TakeAction()
 							SetConclusion(ply:Nick(), k, "RDM Killing on suspicion")
 						else
 							RunConsoleCommand("ulx", "aslayid", (reported and report.attacker) or (not reported and report.victim), tostring(k), "RDM Killing on suspicion")
-							SetConclusion((reported and report.attacker_nick) or (not reported and report.victim_nick), k, "RDMKilling on suspicion")
+							SetConclusion((reported and report.attacker_nick) or (not reported and report.victim_nick), k, "RDM Killing on suspicion")
 						end
 					numbers:AddOption("Default reason", function()
 						local ply = (reported and attacker) or (not reported and victim)
