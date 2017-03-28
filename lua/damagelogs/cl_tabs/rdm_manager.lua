@@ -87,7 +87,7 @@ local function TakeAction()
 	local menuPanel = DermaMenu()
 	menuPanel:AddOption("Set conclusion", function()
 		if report.status != RDM_MANAGER_FINISHED then
-			Damagelog:Notify(DAMAGELOG_NOTIFY_ALERT, "This report is not finished!", 3, "buttons/weapon_cant_buy.wav")
+			Damagelog:Notify(DAMAGELOG_NOTIFY_ALERT, "This report is not finished!", 3, "")
 			return
 		end
 		Derma_StringRequest("Conclusion", "Please write the conclusion for this report", "", function(txt)
@@ -184,6 +184,33 @@ local function TakeAction()
 					numbers_pnl:SetText(k.." times")
 					numbers_pnl:SetImage("icon16/"..v)
 					ply:AddPanel(numbers_pnl)
+					numbers:AddOption("RDM", function()
+						local ply = (reported and attacker) or (not reported and victim)
+						if IsValid(ply) then
+							RunConsoleCommand("ulx", "aslay", ply:Nick(), tostring(k), "RDM")
+							SetConclusion(ply:Nick(), k, "RDM")
+						else
+							RunConsoleCommand("ulx", "aslayid", (reported and report.attacker) or (not reported and report.victim), tostring(k), "RDM")
+							SetConclusion((reported and report.attacker_nick) or (not reported and report.victim_nick), k, "RDM")
+						end
+					numbers:AddOption("Attempted RDM", function()
+						local ply = (reported and attacker) or (not reported and victim)
+						if IsValid(ply) then
+							RunConsoleCommand("ulx", "aslay", ply:Nick(), tostring(k), "Attempted RDM")
+							SetConclusion(ply:Nick(), k, "Attempted RDM")
+						else
+							RunConsoleCommand("ulx", "aslayid", (reported and report.attacker) or (not reported and report.victim), tostring(k), "Attempted RDM")
+							SetConclusion((reported and report.attacker_nick) or (not reported and report.victim_nick), k, "Attempted RDM")
+						end
+					numbers:AddOption("Killing on suspicion", function()
+						local ply = (reported and attacker) or (not reported and victim)
+						if IsValid(ply) then
+							RunConsoleCommand("ulx", "aslay", ply:Nick(), tostring(k), "RDM. Killing on suspicion")
+							SetConclusion(ply:Nick(), k, "RDM. Killing on suspicion")
+						else
+							RunConsoleCommand("ulx", "aslayid", (reported and report.attacker) or (not reported and report.victim), tostring(k), "RDM. Killing on suspicion")
+							SetConclusion((reported and report.attacker_nick) or (not reported and report.victim_nick), k, "RDM. Killing on suspicion")
+						end
 					numbers:AddOption("Default reason", function()
 						local ply = (reported and attacker) or (not reported and victim)
 						if IsValid(ply) then
@@ -548,17 +575,22 @@ function Damagelog:DrawRDMManager(x,y)
 			local attacker = player.GetBySteamID(Damagelog.SelectedReport.attacker)
 			if not IsValid(attacker) and (Damagelog.SelectedReport.status == RDM_MANAGER_WAITING_FOR_ATTACKER or Damagelog.SelectedReport.status == RDM_MANAGER_WAITING_FOR_VICTIM) then
 				DrawStatusMenuOption(RDM_MANAGER_PROGRESS, menu)
+				DrawStatusMenuOption(RDM_MANAGER_FINISHED, menu)
 			end
 			if Damagelog.SelectedReport.status == RDM_MANAGER_WAITING then
 				DrawStatusMenuOption(RDM_MANAGER_PROGRESS, menu)
+				DrawStatusMenuOption(RDM_MANAGER_FINISHED, menu)
 			end
 			if Damagelog.SelectedReport.status == RDM_MANAGER_PROGRESS then
 				if IsValid(attacker) then
 					DrawStatusMenuOption(RDM_MANAGER_WAITING, menu)
+					DrawStatusMenuOption(RDM_MANAGER_FINISHED, menu)
 				end
+				DrawStatusMenuOption(RDM_MANAGER_WAITING, menu)
 				DrawStatusMenuOption(RDM_MANAGER_FINISHED, menu)
 			end
 			if Damagelog.SelectedReport.status == RDM_MANAGER_FINISHED then
+				DrawStatusMenuOption(RDM_MANAGER_WAITING, menu)
 				DrawStatusMenuOption(RDM_MANAGER_PROGRESS, menu)
 			end
 			menu:Open()
