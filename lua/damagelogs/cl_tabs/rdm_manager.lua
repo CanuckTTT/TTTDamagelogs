@@ -193,6 +193,7 @@ local function TakeAction()
 							RunConsoleCommand("ulx", "aslayid", (reported and report.attacker) or (not reported and report.victim), tostring(k), "RDM")
 							SetConclusion((reported and report.attacker_nick) or (not reported and report.victim_nick), k, "RDM")
 						end
+					end):SetImage("icon16/mouse.png")
 					numbers:AddOption("Attempted RDM", function()
 						local ply = (reported and attacker) or (not reported and victim)
 						if IsValid(ply) then
@@ -202,6 +203,17 @@ local function TakeAction()
 							RunConsoleCommand("ulx", "aslayid", (reported and report.attacker) or (not reported and report.victim), tostring(k), "Attempted RDM")
 							SetConclusion((reported and report.attacker_nick) or (not reported and report.victim_nick), k, "Attempted RDM")
 						end
+					end):SetImage("icon16/mouse.png")
+					numbers:AddOption("Killing on suspicion", function()
++						local ply = (reported and attacker) or (not reported and victim)
++						if IsValid(ply) then
++							RunConsoleCommand("ulx", "aslay", ply:Nick(), tostring(k), "RDM. Killing on suspicion")
++							SetConclusion(ply:Nick(), k, "RDM. Killing on suspicion")
++						else
++							RunConsoleCommand("ulx", "aslayid", (reported and report.attacker) or (not reported and report.victim), tostring(k), "RDM. Killing on suspicion")
++							SetConclusion((reported and report.attacker_nick) or (not reported and report.victim_nick), k, "RDM. Killing on suspicion")
++						end
+					end):SetImage("icon16/mouse.png")
 					numbers:AddOption("Default reason", function()
 						local ply = (reported and attacker) or (not reported and victim)
 						if IsValid(ply) then
