@@ -121,15 +121,15 @@ function Damagelog:StartReport(ply)
 		end
 	end
 	if not found then
-		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "No admins online!", 4, "buttons/weapon_cant_buy.wav")
+		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "No admins online!", 4, "")
 		return
 	end
 	if not ply.CanReport then
-		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "You need to play before being able to report!", 4, "buttons/weapon_cant_buy.wav")
+		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "You need to play before being able to report!", 4, "")
 	else
 		local remaining_reports = ply:RemainingReports()
 		if remaining_reports <= 0 then
-			ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "You can only report twice per round!", 4, "buttons/weapon_cant_buy.wav")
+			ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "You can only report twice per round!", 4, "")
 		else
 			net.Start("DL_AllowReport")
 			if ply.DeathDmgLog and ply.DeathDmgLog[Damagelog.CurrentRound] then
@@ -149,15 +149,15 @@ net.Receive("DL_ReportPlayer", function(_len, ply)
 	if ply:RemainingReports() <= 0 or not ply.CanReport then return end
 	if attacker == ply then return end
 	if not IsValid(attacker) then 
-		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "Error reporting : Invalid attacker entity!", 5, "buttons/weapon_cant_buy.wav")
+		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "Error reporting : Invalid attacker entity!", 5, "")
 		return 
 	end
 	if not attacker:GetNWBool("PlayedSRound", true) then
-		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "You can't report spectators!", 5, "buttons/weapon_cant_buy.wav")
+		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "You can't report spectators!", 5, "")
 		return
 	end
 	if table.HasValue(ply.Reported, attacker) then
-		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "You have already reported this player!", 5, "buttons/weapon_cant_buy.wav")
+		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "You have already reported this player!", 5, "")
 		return 
 	end
 	table.insert(ply.Reported, attacker)
@@ -179,16 +179,16 @@ net.Receive("DL_ReportPlayer", function(_len, ply)
 	for k,v in pairs(player.GetHumans()) do
 		if v:CanUseRDMManager() then
 			if v:IsActive() then
-				v:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "A new report has been created! (#"..index..") !", 5, "ui/vote_failure.wav")
+				v:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "A new report has been created! (#"..index..") !", 5, "")
 			else
-				v:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, ply:Nick().." has reported "..attacker:Nick().. " (#"..index..") !", 5, "ui/vote_failure.wav")
+				v:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, ply:Nick().." has reported "..attacker:Nick().. " (#"..index..") !", 5, "")
 			end
 			v:NewReport(Damagelog.Reports.Current[index])
 		end
 	end
 	attacker:SendReport(Damagelog.Reports.Current[index])
 	if not attacker:CanUseRDMManager() then
-		attacker:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, ply:Nick().." has reported you!", 5, "ui/vote_failure.wav")
+		attacker:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, ply:Nick().." has reported you!", 5, "")
 	end
 	ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "You have reported "..attacker:Nick(), 5, "")
 	UpdatePreviousReports()
@@ -211,11 +211,16 @@ net.Receive("DL_UpdateStatus", function(_len, ply)
 		msg = ply:Nick().." is now dealing with the report #"..index.."."
 		for k,v in pairs(player.GetAll()) do
 			if v:SteamID() == tbl.victim then
-				v:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, ply:Nick().." is now handling your report.", 5, "ui/vote_yes.wav")
+				v:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, ply:Nick().." is now handling your report.", 5, "")
 			end
 		end
 	elseif status == RDM_MANAGER_FINISHED then
 		msg = ply:Nick().." has set the report #"..index.." to Finished."
+		for k,v in pairs(player.GetAll()) do
+			if v:SteamID() == tbl.victim then
+				v:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, ply:Nick().." has finished your report.", 5, "")
+			end
+		end
 	end
 	for k,v in pairs(player.GetHumans()) do
 		if v:CanUseRDMManager() then	
@@ -237,7 +242,7 @@ net.Receive("DL_Conclusion", function(_len, ply)
 	local tbl = previous and Damagelog.Reports.Previous[index] or Damagelog.Reports.Current[index]
 	if not tbl then return end
 	if notify and tbl.status != RDM_MANAGER_FINISHED and tbl.status != RDM_MANAGER_CANCELED then
-		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "This report is not finished!", 5, "buttons/weapon_cant_buy.wav")
+		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_ALERT, "This report is not finished!", 5, "")
 		return 
 	end
 	tbl.conclusion = conclusion
@@ -290,7 +295,7 @@ net.Receive("DL_SendAnswer", function(_, ply)
 	tbl.status = RDM_MANAGER_WAITING_FOR_VICTIM
 	for k,v in pairs(player.GetHumans()) do
 		if v:CanUseRDMManager() then
-			v:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, (v:IsActive() and "The reported player " or ply:Nick()).." has answered to the report #"..index.."!", 5, "ui/vote_yes.wav")
+			v:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, (v:IsActive() and "The reported player " or ply:Nick()).." has answered to the report #"..index.."!", 5, "")
 			v:UpdateReport(previous, index)
 		end
 	end
@@ -324,31 +329,31 @@ net.Receive("DL_GetForgive", function(_, ply)
 		if v:CanUseRDMManager() then	
 			if forgive then
 				if v:IsActive() then
-					v:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, "The report #"..index.." has been canceled by the victim!", 5, "ui/vote_yes.wav")
+					v:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, "The report #"..index.." has been canceled by the victim!", 5, "")
 				else
-					v:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, ply:Nick().." has canceled the report #"..index.." !", 5, "ui/vote_yes.wav")
+					v:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, ply:Nick().." has canceled the report #"..index.." !", 5, "")
 				end
 			else
 				if v:IsActive() then
-					v:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, "The victim did not forgive the attacker on the report #"..index.." !", 5, "ui/vote_yes.wav")
+					v:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, "The victim did not forgive the attacker on the report #"..index.." !", 5, "")
 				else
-					v:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, ply:Nick().." did not forgive "..tbl.attacker_nick.." on the report #"..index.." !", 5, "ui/vote_yes.wav")
+					v:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, ply:Nick().." did not forgive "..tbl.attacker_nick.." on the report #"..index.." !", 5, "")
 				end
 			end
 			v:UpdateReport(previous, index)
 		end
 	end
 	if forgive then
-		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, "You decided to cancel the report.", 5, "ui/vote_yes.wav")
+		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, "You decided to cancel the report.", 5, "")
 	else
-		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, "You decided to keep the report.", 5, "ui/vote_yes.wav")
+		ply:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, "You decided to keep the report.", 5, "")
 	end
 	local attacker = GetBySteamID(tbl.attacker)
 	if IsValid(attacker) then
 		if forgive then
-			attacker:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, ply:Nick().." decided to cancel the report.", 5, "ui/vote_yes.wav")
+			attacker:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, ply:Nick().." decided to cancel the report.", 5, "")
 		else
-			attacker:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, ply:Nick().." does not want to forgive you.", 5, "ui/vote_yes.wav")
+			attacker:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, ply:Nick().." does not want to forgive you.", 5, "")
 		end
 	end
 	UpdatePreviousReports()
