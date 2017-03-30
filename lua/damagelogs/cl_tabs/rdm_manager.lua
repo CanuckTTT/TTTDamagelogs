@@ -592,6 +592,10 @@ function Damagelog:DrawRDMManager(x,y)
 				DrawStatusMenuOption(RDM_MANAGER_WAITING, menu)
 				DrawStatusMenuOption(RDM_MANAGER_FINISHED, menu)
 			end
+			if Damagelog.SelectedReport.status == RDM_MANAGER_CANCELED then
+				DrawStatusMenuOption(RDM_MANAGER_PROGRESS, menu)
+				DrawStatusMenuOption(RDM_MANAGER_FINISHED, menu)
+			end
 			if Damagelog.SelectedReport.status == RDM_MANAGER_FINISHED then
 				DrawStatusMenuOption(RDM_MANAGER_WAITING, menu)
 				DrawStatusMenuOption(RDM_MANAGER_PROGRESS, menu)
